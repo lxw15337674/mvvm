@@ -1,0 +1,53 @@
+<!--
+ * @Date: 2020-04-06 12:20:25
+ * @LastEditors: bhwa233
+ * @LastEditTime: 2020-04-06 14:52:43
+ -->
+<div id="app">
+    <input type="text" b-value="message" />
+    <input type="text" b-value="message" />
+    <input type="text" b-value="message" />
+</div>
+
+<script src="./browser.js"></script>
+<script src="./binder.js"></script>
+<script src="./view.js"></script>
+
+<script src='./mediator.js'></script>
+<script src="./hijack.js"></script>
+<script>
+    // 模型
+    let model = {
+        message: 'Hello World1',
+
+        setData(key, newVal) {
+            let val = this
+            let keys = key.split('.')
+            for (let i = 0, len = keys.length; i < len; i++) {
+                if (i < len - 1) {
+                    val = val[keys[i]]
+                } else {
+                    val[keys[i]] = newVal
+                }
+            }
+            return val
+        },
+        getData(key) {
+            let val = this
+            let keys = key.split('.')
+            for (let i = 0, len = keys.length; i < len; i++) {
+                val = val[keys[i]]
+                if (!val && i !== len - 1) { throw new Error(`Cannot read property ${keys[i]} of undefined'`) }
+            }
+            return val
+        }
+    }
+    // 发布/订阅对象
+    let mediator = new Mediator()
+    // 数据劫持(监听model的变化，并发布model数据变化消息)
+    hijack(model, mediator)
+    // 抽象视图(实现绑定指令的解析，并订阅model数据的变化从而更新视图)
+    new View('#app', model, mediator)
+    model.message = 'Hello Ziyi233333222'
+
+</script>
